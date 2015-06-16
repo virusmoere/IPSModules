@@ -1,0 +1,13 @@
+{
+	"elements":
+	[
+		{ "name": "LW12_IP", "type": "ValidationTextBox", "caption": "IP" },
+		{ "name": "LW12_Port", "type": "NumberSpinner", "caption": "Port" },
+		{ "name": "LW12_Type", "type": "Select", "caption": "Controllerversion", 
+			"options": [
+				{ "label": "LEDXXX (5577)", "value": "LEDXXX" },
+				{ "label": "HX001 (5000) - nicht implementiert!!!", "value": "HX001" }
+			]
+		}
+	]
+}

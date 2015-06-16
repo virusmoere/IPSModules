@@ -1,0 +1,14 @@
+{
+	"id": "{fe11a29d-9d81-4124-8204-f455a5b3b08b}",
+	"name": "LW12",
+	"type": 3,
+	"vendor": "",
+	"aliases": 
+	[
+		"LW12"
+	],
+	"parentRequirements": [],
+	"childRequirements": [],
+	"implemented": [],
+	"prefix": "LW12"
+}
