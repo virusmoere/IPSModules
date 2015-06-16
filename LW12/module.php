@@ -112,6 +112,12 @@
 			$LW12->SetColorDec($decrgb);
 		}
 		
+		public function SetColorHex($hexrgb)
+		{
+			$LW12 = $this->init();
+			$LW12->SetColorHex($hexrgb);
+		}
+		
 		public function SetMode($mode)
 		{
 			$LW12 = $this->init();

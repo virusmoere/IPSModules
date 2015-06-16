@@ -109,6 +109,12 @@ class LW12_5577 {
 		$this->sendPacket($command, 0);
 	}
 	
+	public function SetColorHex($hexrgb)
+	{
+		$command = '56' . $hexrgb . 'aa';
+		$this->sendPacket($command, 0);
+	}
+	
 	public function SetMode($mode, $speed)
 	{
 		$speed = intval(abs(($speed/100) * 31 - 32));
