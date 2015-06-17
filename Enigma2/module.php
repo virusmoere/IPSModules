@@ -94,7 +94,7 @@
 		{
 			$IP = $this->ReadPropertyString("IP");
 			$Port = ":" . $this->ReadPropertyInteger("Port");
-			$SSL = $this->RegisterPropertyBoolean("SSL");
+			$SSL = $this->ReadPropertyBoolean("SSL");
 			$Username = $this->ReadPropertyString("Username");
 			$Password = $this->ReadPropertyString("Password");
 			
