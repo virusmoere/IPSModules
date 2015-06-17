@@ -22,15 +22,10 @@
 			//Never delete this line!
 			parent::ApplyChanges();
 			
+			$this->RegisterVariableBoolean("power", "Status", "~Switch");
+			$this->EnableAction("power");
+			
 		}
-		
-		/**
-		* This function will be available automatically after the module is imported with the module control.
-		* Using the custom prefix this function will be callable from PHP and JSON-RPC through:
-		*
-		* LW12_PowerOn($id);
-		*
-		*/
 		
 		// http://dream.reichholf.net/wiki/Enigma2:WebInterface
 		
@@ -92,7 +87,7 @@
 		{
 			$command = "message?text=" . $message . "&type=" . $type . "&timeout=" . $timeout;
 			$xml = $this->SendCommand($command);
-			return xml->e2result;
+			return $xml->e2result;
 		}
 		
 		private function SendCommand($command)
@@ -102,6 +97,16 @@
 			$SSL = $this->ReadPropertyInteger("SSL");
 			$Username = $this->ReadPropertyString("Username");
 			$Password = $this->ReadPropertyString("Password");
+			
+			$authstring = "";
+			if($Username != "" && $Password == "")
+			{
+				$authstring = $Username . "@";
+			}
+			elseif($Username != "" && $Password != "")
+			{
+				$authstring = $Username . ":" . $Password . "@";
+			}
 			
 			$ch = curl_init();
 			
@@ -114,7 +119,7 @@
 			}
 			
 			
-			$path = $protocol . $IP . $Port . "/web/" . $command;
+			$path = $protocol . $authstring . $IP . $Port . "/web/" . $command;
 			
 			curl_setopt($ch, CURLOPT_URL, $path);
 			curl_setopt($ch, CURLOPT_FAILONERROR, 1);
@@ -134,6 +139,9 @@
 		public function RequestAction($Ident, $Value)
 		{
 			switch($Ident) {
+				case "power":
+					$this->SetPowerstate(0);
+					SetValue($this->GetIDForIdent($Ident), $Value);
 				default:
 					throw new Exception("Invalid ident");
 			}		
