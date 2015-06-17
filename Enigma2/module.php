@@ -22,9 +22,26 @@
 			//Never delete this line!
 			parent::ApplyChanges();
 			
+			$this->RegisterProfileIntegerEx("MessageType.E2", "Mail", "", "", Array(
+				Array(0, "Ja/Nein", "", -1),
+				Array(1, "Info", "", -1),
+				Array(2, "Warnung", "", -1),
+				Array(3, "Kritisch", "", -1),
+			));
+			
 			$this->RegisterVariableBoolean("power", "Status", "~Switch");
 			$this->EnableAction("power");
+      
+			$this->RegisterVariableInteger("messagetype", "Nachrichtentyp", "MessageType.E2");
+			$this->EnableAction("messagetype");
+			$this->RegisterVariableString("message", "Nachricht", "~TextBox");
+			$this->EnableAction("message");
 			
+			$this->RegisterVariableString("program", "Programm", "~String");
+			$this->RegisterVariableString("show", "Sendung", "~String");
+			$this->RegisterVariableString("description", "Beschreibung", "~TextBox");
+			
+			$this->RegisterScript("update", "Aktualisieren", "<?\n\nE2_RequestUpdate(IPS_GetParent(\$_IPS['SELF']));\n\n?>", 0);
 		}
 		
 		// http://dream.reichholf.net/wiki/Enigma2:WebInterface
@@ -33,7 +50,17 @@
 		{
 			$command = "powerstate?";
 			$xml = $this->SendCommand($command);
-			return $xml->e2instandby;
+			$status = $xml->e2instandby;
+			if(strpos($status, "false"))
+			{
+				$status = true;
+			}
+			else
+			{
+				$status = false;
+			}
+			SetValue($this->GetIDForIdent("power"), $status);
+			return $status;
 		}
 		
 		public function SetPowerstate($state)
@@ -67,20 +94,16 @@
 			return $xml->e2instandby;
 		}
 		
-		public function GetCurrentChannel()
+		public function GetCurrentChannelInformation()
 		{
 			$command = "subservices";
 			$xml = $this->SendCommand($command);
-			return utf8_decode($xml->e2service->e2servicename);
-		}
-		
-		public function GetCurrentChannelEventDescription()
-		{
-			$command = "subservices";
-			$xml = $this->SendCommand($command);
+			SetValue($this->GetIDForIdent("program"), utf8_decode($xml->e2service->e2servicename));
+      
 			$command = "epgservice?sRef=" . $xml->e2service->e2servicereference;
 			$xml = $this->SendCommand($command);
-			return utf8_decode($xml->e2event[0]->e2eventdescriptionextended);
+			SetValue($this->GetIDForIdent("show"), utf8_decode($xml->e2event[0]->e2eventdescription));
+			SetValue($this->GetIDForIdent("description"), utf8_decode($xml->e2event[0]->e2eventdescriptionextended));
 		}
 		
 		public function ShowMessage($message, $type, $timeout)
@@ -132,13 +155,23 @@
 			// $xml === False on failure
 			$xml = simplexml_load_string($returned);
 			if(!$xml)
-				throw new Exception("Invalid enigma2 request! Request: ". $command);
+				throw new Exception("Connection error / invalid command");
 			return $xml;
+		}
+		
+		public function RequestUpdate()
+		{
+			$this->GetPowerstate();
+			$this->GetCurrentChannelInformation();
 		}
 		
 		public function RequestAction($Ident, $Value)
 		{
 			switch($Ident) {
+				case "update":
+					$this->RequestUpdate();
+					SetValue($this->GetIDForIdent($Ident), $Value);
+					break;
 				case "power":
 					if($Value)
 					{
@@ -148,6 +181,13 @@
 					{
 						$this->SetPowerstate(5);
 					}
+					SetValue($this->GetIDForIdent($Ident), $Value);
+					break;
+				case "message":
+					$this->ShowMessage($Value , GetValue($this->GetIDForIdent("messagetype")), 0);
+					SetValue($this->GetIDForIdent($Ident), $Value);
+					break;
+				case "messagetype":
 					SetValue($this->GetIDForIdent($Ident), $Value);
 					break;
 				default:
