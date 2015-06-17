@@ -94,7 +94,7 @@
 		{
 			$IP = $this->ReadPropertyString("IP");
 			$Port = ":" . $this->ReadPropertyInteger("Port");
-			$SSL = $this->ReadPropertyInteger("SSL");
+			$SSL = $this->RegisterPropertyBoolean("SSL");
 			$Username = $this->ReadPropertyString("Username");
 			$Password = $this->ReadPropertyString("Password");
 			
@@ -140,8 +140,16 @@
 		{
 			switch($Ident) {
 				case "power":
-					$this->SetPowerstate(0);
+					if($Value)
+					{
+						$this->SetPowerstate(4);
+					}
+					else
+					{
+						$this->SetPowerstate(5);
+					}
 					SetValue($this->GetIDForIdent($Ident), $Value);
+					break;
 				default:
 					throw new Exception("Invalid ident");
 			}		

@@ -3,7 +3,7 @@
 	[
 		{ "name": "IP", "type": "ValidationTextBox", "caption": "IP" },
 		{ "name": "Port", "type": "NumberSpinner", "caption": "Port" },
-		{ "name": "SSL", "type": "CheckBox", "caption": "SSL" }
+		{ "name": "SSL", "type": "CheckBox", "caption": "SSL" },
 		{ "name": "Username", "type": "ValidationTextBox", "caption": "Username" },
 		{ "name": "Password", "type": "PasswordTextBox", "caption": "Passwort" }
 	]
