@@ -102,7 +102,7 @@
       
 			$command = "epgservice?sRef=" . $xml->e2service->e2servicereference;
 			$xml = $this->SendCommand($command);
-			SetValue($this->GetIDForIdent("show"), utf8_decode($xml->e2event[0]->e2eventdescription));
+			SetValue($this->GetIDForIdent("show"), utf8_decode($xml->e2event[0]->e2eventtitle) . " - " . utf8_decode($xml->e2event[0]->e2eventdescription));
 			SetValue($this->GetIDForIdent("description"), utf8_decode($xml->e2event[0]->e2eventdescriptionextended));
 		}
 		
