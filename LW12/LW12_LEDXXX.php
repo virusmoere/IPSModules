@@ -1,6 +1,6 @@
 <?
 
-class LW12_5577 {
+class LW12_LEDXXX {
 	private $IP = "";
 	private $Port = 5577;
 	

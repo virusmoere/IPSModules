@@ -14,7 +14,8 @@
 			$this->RegisterPropertyInteger("LW12_Port", 5577);
 			$this->RegisterPropertyString("LW12_Type", "");
 			
-			include_once(__DIR__ . "/LW12_5577.php");
+			include_once(__DIR__ . "/LW12_LEDXXX.php");
+			include_once(__DIR__ . "/LW12_HX001.php");
 		}
 	
 		public function ApplyChanges()
@@ -63,10 +64,10 @@
 			switch($this->ReadPropertyString("LW12_Type"))
 			{
 				case "LEDXXX":
-					$LW12 = new LW12_5577($this->ReadPropertyString("LW12_IP"), $this->ReadPropertyInteger("LW12_Port"));
+					$LW12 = new LW12_LEDXXX($this->ReadPropertyString("LW12_IP"), $this->ReadPropertyInteger("LW12_Port"));
 					break;
 				case "HX001":
-					throw new Exception("Not implemented");
+					$LW12 = new LW12_HX001($this->ReadPropertyString("LW12_IP"), $this->ReadPropertyInteger("LW12_Port"));
 					break;
 				default:
 					throw new Exception("Invalid controller type");
