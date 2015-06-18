@@ -65,30 +65,16 @@
 		
 		public function SetPowerstate($state)
 		{
-			switch($state)
-			{
-				case 0:
-					$state = 0; // Toogle Standby
-					break;
-				case 1:
-					$state = 1; // Deepstandby
-					break;
-				case 2:
-					$state = 2; // Reboot
-					break;
-				case 3:
-					$state = 3; // Restart Enigma2
-					break;
-				case 4:
-					$state = 4; // Wakeup form Standby
-					break;
-				case 5:
-					$state = 5; // Standby
-					break;
-				default:
-					throw new Exception("Invalid enigma2 powerstate!");
-			}
+			// 0 Toogle Standby
+			// 1 Deepstandby
+			// 2 Reboot
+			// 3 Restart Enigma2
+			// 4 Wakeup form Standby
+			// 5 Standby
 			
+			if($state < 0 || $state > 5)
+				throw new Exception("Invalid enigma2 powerstate!");
+						
 			$command = "powerstate?newstate=" . $state;
 			$xml = $this->SendCommand($command);
 			return $xml->e2instandby;
