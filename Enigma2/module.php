@@ -102,8 +102,17 @@
       
 			$command = "epgservice?sRef=" . $xml->e2service->e2servicereference;
 			$xml = $this->SendCommand($command);
-			SetValue($this->GetIDForIdent("show"), utf8_decode($xml->e2event[0]->e2eventtitle) . " - " . utf8_decode($xml->e2event[0]->e2eventdescription));
-			SetValue($this->GetIDForIdent("description"), utf8_decode($xml->e2event[0]->e2eventdescriptionextended));
+			
+			if($xml->e2event[0])
+			{
+				SetValue($this->GetIDForIdent("show"), utf8_decode($xml->e2event[0]->e2eventtitle) . " - " . utf8_decode($xml->e2event[0]->e2eventdescription));
+				SetValue($this->GetIDForIdent("description"), utf8_decode($xml->e2event[0]->e2eventdescriptionextended));
+			}
+			else 
+			{
+				SetValue($this->GetIDForIdent("show"), "N/A");
+				SetValue($this->GetIDForIdent("description"), "");
+			}
 		}
 		
 		public function ShowMessage($message, $type, $timeout)
@@ -151,11 +160,17 @@
 			curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 			
 			$returned = curl_exec($ch);
+			
+			if(curl_errno($ch))
+			{
+				throw new Exception("Connection error:" . curl_error($ch));
+			}
+			
 			curl_close($ch);
 			// $xml === False on failure
 			$xml = simplexml_load_string($returned);
 			if(!$xml)
-				throw new Exception("Connection error / invalid command");
+				throw new Exception("Invalid command / empty response");
 			return $xml;
 		}
 		
