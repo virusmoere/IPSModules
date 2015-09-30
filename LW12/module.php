@@ -11,9 +11,6 @@
 			$this->RegisterPropertyString("LW12_IP", "");
 			$this->RegisterPropertyInteger("LW12_Port", 5577);
 			$this->RegisterPropertyString("LW12_Type", "");
-			
-			include_once(__DIR__ . "/LW12_LEDXXX.php");
-			include_once(__DIR__ . "/LW12_HX001.php");
 		}
 	
 		public function ApplyChanges()
@@ -59,6 +56,9 @@
 		
 		private function init()
 		{
+			include_once(__DIR__ . "/LW12_LEDXXX.php");
+			include_once(__DIR__ . "/LW12_HX001.php");
+			
 			switch($this->ReadPropertyString("LW12_Type"))
 			{
 				case "LEDXXX":
