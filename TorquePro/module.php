@@ -82,26 +82,32 @@
 				$data[$key]  = $value;
 			}
 			
-			if(!array_key_exists('id', $data) || (string)$data['id'] === NULL)
+			if(isset($data['id']) || array_key_exists('id', $data))
 			{
-				IPS_LogMessage("TorquePro", "Invalid Request");
-				$error = true;
-			}
-			
-			$allowedIds = $this->ReadPropertyString("allowedIds");
-			if($allowedIds !== NULL)
-			{
-				$Ids = explode(",", $allowedIds);
-				$i = 0;
-				foreach($Ids as $Id) {
-					if((string)$data['id'] == md5($Id))
-						$i++;
-				}
-				if(!$i)
+				if($data['id'] !== NULL)
 				{
-					IPS_LogMessage("TorquePro", "Unauthorized ID: ".(string)$data['id']);
-					$error = true;
+					$allowedIds = $this->ReadPropertyString("allowedIds");
+					if($allowedIds !== NULL)
+					{
+						$Ids = explode(",", $allowedIds);
+						$i = 0;
+						foreach($Ids as $Id) {
+							if((string)$data['id'] == md5($Id))
+								$i++;
+						}
+						if(!$i)
+						{
+							IPS_LogMessage("TorquePro", "Unauthorized ID: ".(string)$data['id']);
+							$error = true;
+						}
+					} else {
+						IPS_LogMessage("TorquePro", "Invalid Request: Id invalid");
+						$error = true;
+					}
 				}
+			} else {
+				IPS_LogMessage("TorquePro", "Invalid Request: Id not existant");
+				$error = true;
 			}
 			
 			if(!$error)
@@ -151,19 +157,20 @@
 					if (preg_match("/^k/", $key)) {
 							SetValue($variable, floatval($value));
 						} else if ($key == "time" || $key == "session") {
-							SetValue($variable, intval($value));
+							SetValue($variable, $value/1000);
 						} else {
 							SetValue($variable, $value);
 						}
 						IPS_SetName($variable, $friendly_name);
 					}
 				}
-			}
+        // Required by Torque Pro App
+			  print "OK!";
+			} else {
+        print "NOK!";
+      }
 			
 			IPS_LogMessage("TorquePro", "Query String: ".$_SERVER['QUERY_STRING']);
-			
-			// Required by Torque Pro App
-			print "OK!";
 		}
 	}
 
