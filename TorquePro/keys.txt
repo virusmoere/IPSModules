@@ -145,5 +145,7 @@ $key_names = [
 	"kff5203" => "Litres Per 100 Kilometer(Long Term Average)",
 	"session" => "Session ID",
 	"time" => "Timestamp",
+	"notice" => "Notice",
+	"profileName" => "Profile name",
 ];
 ?>

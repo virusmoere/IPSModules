@@ -159,7 +159,7 @@
 						} else if ($key == "time" || $key == "session") {
 							SetValue($variable, $value/1000);
 						} else {
-							SetValue($variable, $value);
+							SetValue($variable, utf8_decode($value));
 						}
 						IPS_SetName($variable, $friendly_name);
 					}
