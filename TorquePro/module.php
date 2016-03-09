@@ -65,6 +65,30 @@
 			curl_close($ch);
 		}
 		
+		private function Map($lat, $long, $parentid)
+		{
+			$iframe = <<<EOF
+<iframe 
+	style="width: 600px; height: 350px; margin: 0 auto; display:block;"
+	width="600"
+	height="350"
+	frameborder="0"
+	src="https://www.bing.com/maps/embed/viewer.aspx?v=3&amp;cp=$lat~$long&amp;lvl=18&amp;w=600&amp;h=350&amp;sty=h&amp;typ=d&amp;pp=~~$lat~$long&amp;ps=&amp;dir=0&amp;mkt=de-de&amp;src=SHELL&amp;form=BMEMJS">
+</iframe>
+EOF;
+
+			$variable = @IPS_GetObjectIDByIdent('GoogleMaps', $parentid);
+			if($variable === false)
+			{
+				$variable = IPS_CreateVariable(3);// create string var
+				IPS_SetName($variable, 'Position'); // name var by key name
+				IPS_SetIdent($variable, 'GoogleMaps');
+				IPS_SetVariableCustomProfile($variable, "~HTMLBox");
+				IPS_SetParent($variable, $parentid); // set var parent
+			}	
+			SetValueString($variable, $iframe);
+		}
+		
 		/**
 		* This function will be available automatically after the module is imported with the module control.
 		* Using the custom prefix this function will be callable from PHP and JSON-RPC through:
@@ -134,23 +158,23 @@
 						if (preg_match("/^k/", $key)) {
 							// float
 							$variable = IPS_CreateVariable(2);// create float var
-								IPS_SetName($variable, $friendly_name); // name var by key name
-								IPS_SetIdent($variable, $key);
-								IPS_SetParent($variable, $parentid); // set var parent
-								SetValueFloat($variable, floatval($value)); // set value
-							} else if ($key == "time" || $key == "session") {
+							IPS_SetName($variable, $friendly_name); // name var by key name
+							IPS_SetIdent($variable, $key);
+							IPS_SetParent($variable, $parentid); // set var parent
+							SetValueFloat($variable, floatval($value)); // set value
+						} else if ($key == "time" || $key == "session") {
 							$variable = IPS_CreateVariable(1);// create int var
-								IPS_SetName($variable, $friendly_name); // name var by key name
-								IPS_SetIdent($variable, $key);
-								IPS_SetVariableCustomProfile($variable, "~UnixTimestamp");
-								IPS_SetParent($variable, $parentid); // set var parent
-							} else {
+							IPS_SetName($variable, $friendly_name); // name var by key name
+							IPS_SetIdent($variable, $key);
+							IPS_SetVariableCustomProfile($variable, "~UnixTimestamp");
+							IPS_SetParent($variable, $parentid); // set var parent
+						} else {
 							//string
 							$variable = IPS_CreateVariable(3);// create string var
-								IPS_SetName($variable, $friendly_name); // name var by key name
-								IPS_SetIdent($variable, $key);
-								IPS_SetParent($variable, $parentid); // set var parent
-							}
+							IPS_SetName($variable, $friendly_name); // name var by key name
+							IPS_SetIdent($variable, $key);
+							IPS_SetParent($variable, $parentid); // set var parent
+						}
 					} 
 					
 					// Variable exists -> just set value
@@ -164,6 +188,13 @@
 						IPS_SetName($variable, $friendly_name);
 					}
 				}
+				
+				// Map (GPS long, GPS lat)
+				if(isset($data['kff1005']) || isset($data['kff1006']))
+				{
+					$this->Map($data['kff1006'], $data['kff1005'], $parentid);
+				}
+
 				// Required by Torque Pro App
 				print "OK!";
 			} else {
