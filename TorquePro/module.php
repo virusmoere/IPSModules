@@ -18,7 +18,15 @@
 			//Never delete this line!
 			parent::ApplyChanges();
 			
-			$sid = $this->RegisterScript("Hook", "Hook", "<? //Do not delete or modify.\ninclude(IPS_GetKernelDirEx().\"scripts/__ipsmodule.inc.php\");\ninclude(\"../modules/IPSModules/TorquePro/module.php\");\n(new TorquePro(".$this->InstanceID."))->ProcessHookData();");
+			$hook_script = <<<EOF
+<? 
+//Do not delete or modify.
+include(IPS_GetKernelDirEx()."scripts/__ipsmodule.inc.php");
+include("../modules/IPSModules/TorquePro/module.php");
+(new TorquePro($this->InstanceID))->ProcessHookData();
+EOF;
+			
+			$sid = $this->RegisterScript("Hook", "Hook", $hook_script);
 			$this->RegisterHook("/hook/torque", $sid);
 			
 			if(@$this->GetIDForIdent("Torque_Keys") === false) {
@@ -51,18 +59,24 @@
 		private function ForwardRequest($RequestURI)
 		{
 			/* Forward to Ian's Torque API: */
-			$ch = curl_init();
-			$RequestURI = str_replace("/hook/torque", "", $RequestURI);
-			$url = $this->ReadPropertyString("forwardRequestsURL").$RequestURI;
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_FAILONERROR, true);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			if(curl_exec($ch) === false)
+			$forwardRequestsURL = $this->ReadPropertyString("forwardRequestsURL");
+			if ($forwardRequestsURL != "")
 			{
-				IPS_LogMessage("TorquePro", "Forwarding request failed. cURL: ".curl_error($ch));
+				$ch = curl_init();
+				$RequestURI = str_replace("/hook/torque", "", $RequestURI);
+				$url = $forwardRequestsURL.$RequestURI;
+				curl_setopt($ch, CURLOPT_URL, $url);
+				curl_setopt($ch, CURLOPT_FAILONERROR, true);
+				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				if(curl_exec($ch) === false)
+				{
+					IPS_LogMessage("TorquePro", "Forwarding request failed. cURL: ".curl_error($ch));
+				}
+				curl_close($ch);
+			} else {
+				IPS_LogMessage("TorquePro", "Forwarding request failed. URL empty!");
 			}
-			curl_close($ch);
 		}
 		
 		private function Map($lat, $long, $parentid)
@@ -111,7 +125,7 @@ EOF;
 				if($data['id'] !== NULL)
 				{
 					$allowedIds = $this->ReadPropertyString("allowedIds");
-					if($allowedIds !== NULL)
+					if($allowedIds != "")
 					{
 						$Ids = explode(",", $allowedIds);
 						$i = 0;
@@ -124,10 +138,10 @@ EOF;
 							IPS_LogMessage("TorquePro", "Unauthorized ID: ".(string)$data['id']);
 							$error = true;
 						}
-					} else {
-						IPS_LogMessage("TorquePro", "Invalid Request: Id invalid");
-						$error = true;
 					}
+				} else {
+					IPS_LogMessage("TorquePro", "Invalid Request: Id invalid");
+					$error = true;
 				}
 			} else {
 				IPS_LogMessage("TorquePro", "Invalid Request: Id not existant");
@@ -190,7 +204,7 @@ EOF;
 				}
 				
 				// Map (GPS long, GPS lat)
-				if(isset($data['kff1005']) || isset($data['kff1006']))
+				if(isset($data['kff1005']) && isset($data['kff1006']))
 				{
 					$this->Map($data['kff1006'], $data['kff1005'], $parentid);
 				}
