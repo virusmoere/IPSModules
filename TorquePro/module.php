@@ -52,8 +52,8 @@
 		{
 			/* Forward to Ian's Torque API: */
 			$ch = curl_init();
-			$RequestURI = trim("/hook/torque", $RequestURI);
-			$url = $this->ReadPropertyString("forwardRequestsURL").urlencode($RequestURI);
+			$RequestURI = str_replace("/hook/torque", "", $RequestURI);
+			$url = $this->ReadPropertyString("forwardRequestsURL").$RequestURI;
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_FAILONERROR, true);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -164,14 +164,12 @@
 						IPS_SetName($variable, $friendly_name);
 					}
 				}
-        // Required by Torque Pro App
-			  print "OK!";
+				// Required by Torque Pro App
+				print "OK!";
 			} else {
-        print "NOK!";
-      }
-			
+				print "NOK!";
+			}
 			IPS_LogMessage("TorquePro", "Query String: ".$_SERVER['QUERY_STRING']);
 		}
 	}
-
 ?>
