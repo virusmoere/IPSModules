@@ -115,6 +115,11 @@ class LW12_LEDXXX {
 		$this->sendPacket($command, 0);
 	}
 	
+	public function SetBrightness($brightness)
+	{
+		throw new Exception('Not implemented');
+	}
+
 	public function SetMode($mode, $speed)
 	{
 		$speed = intval(abs(($speed/100) * 31 - 32));
