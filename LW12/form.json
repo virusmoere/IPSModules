@@ -7,6 +7,7 @@
 			"options": [
 				{ "label": "LEDXXX (5577)", "value": "LEDXXX" },
 				{ "label": "HX001 (5000) - nicht implementiert!!!", "value": "HX001" }
+				{ "label": "FC_820 (5000)", "value": "FC_820" }
 			]
 		}
 	]
